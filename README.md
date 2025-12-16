@@ -1,4 +1,4 @@
-                           - Envinroment Monitor (ESP8266 Based) -
+                                       - Envinroment Monitor (ESP8266 Based) -
 
 - Wi-Fi enabled CO₂ / temperature / humidity monitor using an SCD30 + ILI9341 TFT.
   
