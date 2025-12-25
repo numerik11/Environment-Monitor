@@ -11,12 +11,19 @@
                               ===================== Pins. (Wemos D1 R2/Mini) ===================== 
 
 -#define CO2_TX_PIN  D0  // Senseair S8 UART TX (no interrupt needed)
+
 -#define TFT_RST     D1
+
 -#define TFT_DC      D2
+
 -#define CO2_RX_PIN  D4  // Senseair S8 UART RX (needs interrupt-capable pin; avoid SPI pins)
+
 -#define DHT_PIN     D6
+
 -#define BUTTON_PIN  -1   // set to -1 to disable button handling
+
 -#define BL_PIN      D3
+
 -#define TFT_CS      D8
 
 
