@@ -136,6 +136,9 @@ static const uint16_t COL_BAD       = RGB565(240,90,90);
 // ===================== UI layout =====================
 struct Panel { int16_t x,y,w,h; };
 static Panel header = {0,0,SCREEN_WIDTH,36};
+static inline Panel makePanel(int x, int y, int w, int h) {
+  return Panel{(int16_t)x, (int16_t)y, (int16_t)w, (int16_t)h};
+}
 
 static const uint8_t UI_RADIUS = 8;
 static const int UI_TAB_H              = 18;
@@ -370,7 +373,7 @@ static void drawModernTrendIndicator(int16_t x, int16_t y, int8_t dir, uint16_t 
   else if(dir<0) tft.fillTriangle(x, y, x+6, y, x+3, y+6, color);
 }
 
-static void drawOverlayBox(const char* title, const char* msg, uint16_t accent = COL_ACCENT) {
+static void __attribute__((unused)) drawOverlayBox(const char* title, const char* msg, uint16_t accent = COL_ACCENT) {
   const int w = SCREEN_WIDTH - 40;
   const int h = 72;
   const int x = 20;
@@ -386,7 +389,7 @@ static void drawOverlayBox(const char* title, const char* msg, uint16_t accent =
   tft.setCursor(x+10, y+42); tft.print(msg);
 }
 
-static void showToast(const char* msg, uint16_t color = COL_TEXT, uint32_t ms = 1200) {
+static void __attribute__((unused)) showToast(const char* msg, uint16_t color = COL_TEXT, uint32_t ms = 1200) {
   const int h = 22, x = 8, w = SCREEN_WIDTH - 16, y = SCREEN_HEIGHT - h - 6;
   tft.fillRoundRect(x, y, w, h, 8, COL_CARD);
   tft.drawRoundRect(x, y, w, h, 8, COL_GRID);
@@ -640,9 +643,9 @@ static void drawSegmentedLine(const int* xs, const int* ys, int n, uint16_t line
 }
 
 // ===================== Mini graphs (30m cards) =====================
-static void drawMiniGraphU16(const Panel& p, const uint16_t* buf, uint16_t lineColor,
-                            uint16_t vminClamp, uint16_t vmaxClamp, const char* /*leftLbl*/, const char* unitLbl,
-                            float /*currentValue*/, int minutesSpan, bool /*showBadge*/)
+static void __attribute__((unused)) drawMiniGraphU16(const Panel& p, const uint16_t* buf, uint16_t lineColor,
+                             uint16_t vminClamp, uint16_t vmaxClamp, const char* /*leftLbl*/, const char* unitLbl,
+                             float /*currentValue*/, int minutesSpan, bool /*showBadge*/)
 {
   drawCard(p);
   GridRect g=gridRect(p);
@@ -821,7 +824,7 @@ static void updateDashboardBadges() {
 
   const int contentTop = header.h + UI_TAB_H + UI_SECTION_TITLE_GAP;
   const int availH     = SCREEN_HEIGHT - (contentTop + UI_BOTTOM_MARGIN);
-  Panel mainCard = {UI_PAD_X, contentTop, SCREEN_WIDTH - 2*UI_PAD_X, availH};
+  Panel mainCard = makePanel(UI_PAD_X, contentTop, SCREEN_WIDTH - 2*UI_PAD_X, availH);
 
   const int padX = 10;
   const int overlayX = mainCard.x + 6;
@@ -873,7 +876,7 @@ static void draw30MinDashboard() {
   const int contentTop = header.h + UI_TAB_H + UI_SECTION_TITLE_GAP;
   const int availH = SCREEN_HEIGHT - (contentTop + UI_BOTTOM_MARGIN);
 
-  Panel mainCard = {UI_PAD_X, contentTop, SCREEN_WIDTH - 2*UI_PAD_X, availH};
+  Panel mainCard = makePanel(UI_PAD_X, contentTop, SCREEN_WIDTH - 2*UI_PAD_X, availH);
 
   // Frame
   tft.fillRoundRect(mainCard.x+2, mainCard.y+2, mainCard.w, mainCard.h, 8, COL_GRID);
@@ -881,7 +884,7 @@ static void draw30MinDashboard() {
 
   const int graphTop = mainCard.y + 4;
   const int graphH = mainCard.h - 8;
-  Panel graph = {mainCard.x + 4, graphTop, mainCard.w - 8, graphH};
+  Panel graph = makePanel(mainCard.x + 4, graphTop, mainCard.w - 8, graphH);
 
   // base graph (temp) with frame/grid
   drawMiniGraphU8(graph, tempSlots, COL_TEMP, encodeTemp(0), encodeTemp(100), "", "", currentTemp, decodeTemp, 36, false, false, true, true, true);
@@ -956,10 +959,10 @@ static void drawTabs(){
 }
 
 // ---- Fullscreen CO2 24h ----
-static void drawCO2FullScreen(){
+static void __attribute__((unused)) drawCO2FullScreen(){
   const int contentTop = header.h + UI_TAB_H + UI_SECTION_TITLE_GAP;
-  Panel full={UI_PAD_X,contentTop,SCREEN_WIDTH-2*UI_PAD_X,
-              SCREEN_HEIGHT-(contentTop+UI_BOTTOM_MARGIN)};
+  Panel full = makePanel(UI_PAD_X, contentTop, SCREEN_WIDTH - 2*UI_PAD_X,
+                         SCREEN_HEIGHT - (contentTop + UI_BOTTOM_MARGIN));
 
   tft.fillRoundRect(full.x+2, full.y+2, full.w, full.h, 10, COL_GRID);
   drawCard(full);
@@ -1035,7 +1038,7 @@ static void drawTempHumFullScreen(){
   const int dispStart = (twentyFourGraphResetOriginSlot >= 0) ? twentyFourGraphResetOriginSlot : 0;
 
   // Temperature card
-  Panel top={UI_PAD_X,contentTop,SCREEN_WIDTH-2*UI_PAD_X,eachH};
+  Panel top = makePanel(UI_PAD_X, contentTop, SCREEN_WIDTH - 2*UI_PAD_X, eachH);
   tft.fillRoundRect(top.x+2, top.y+2, top.w, top.h, 10, COL_GRID);
   drawCard(top);
   tft.fillRect(top.x, top.y, top.w, 20, COL_TEMP);
@@ -1097,7 +1100,7 @@ static void drawTempHumFullScreen(){
   }
 
   // Humidity card
-  Panel bot={UI_PAD_X,contentTop+eachH+UI_GUTTER,SCREEN_WIDTH-2*UI_PAD_X,eachH};
+  Panel bot = makePanel(UI_PAD_X, contentTop + eachH + UI_GUTTER, SCREEN_WIDTH - 2*UI_PAD_X, eachH);
   tft.fillRoundRect(bot.x+2, bot.y+2, bot.w, bot.h, 10, COL_GRID);
   drawCard(bot);
   tft.fillRect(bot.x, bot.y, bot.w, 20, COL_HUM);
@@ -1160,10 +1163,10 @@ static void drawTempHumFullScreen(){
 }
 
 // ---- CO2 12h ----
-static void drawCO212Hour(){
+static void __attribute__((unused)) drawCO212Hour(){
   const int contentTop = header.h + UI_TAB_H + UI_SECTION_TITLE_GAP;
-  Panel half = { UI_PAD_X, contentTop, SCREEN_WIDTH - 2*UI_PAD_X,
-                 SCREEN_HEIGHT - (contentTop + UI_BOTTOM_MARGIN) };
+  Panel half = makePanel(UI_PAD_X, contentTop, SCREEN_WIDTH - 2*UI_PAD_X,
+                         SCREEN_HEIGHT - (contentTop + UI_BOTTOM_MARGIN));
 
   tft.fillRoundRect(half.x+2, half.y+2, half.w, half.h, 10, COL_GRID);
   drawCard(half);
@@ -1259,7 +1262,7 @@ static void drawTempHum12Hour(){
   const int dispStart = (twelveGraphResetOriginSlot >= 0) ? max(baseStart, twelveGraphResetOriginSlot) : baseStart;
 
   // Temperature
-  Panel top={UI_PAD_X,contentTop,SCREEN_WIDTH-2*UI_PAD_X,eachH};
+  Panel top = makePanel(UI_PAD_X, contentTop, SCREEN_WIDTH - 2*UI_PAD_X, eachH);
   tft.fillRoundRect(top.x+2, top.y+2, top.w, top.h, 10, COL_GRID);
   drawCard(top);
   tft.fillRect(top.x, top.y, top.w, 20, COL_TEMP);
@@ -1316,7 +1319,7 @@ static void drawTempHum12Hour(){
   }
 
   // Humidity
-  Panel bot={UI_PAD_X,contentTop+eachH+UI_GUTTER,SCREEN_WIDTH-2*UI_PAD_X,eachH};
+  Panel bot = makePanel(UI_PAD_X, contentTop + eachH + UI_GUTTER, SCREEN_WIDTH - 2*UI_PAD_X, eachH);
   tft.fillRoundRect(bot.x+2, bot.y+2, bot.w, bot.h, 10, COL_GRID);
   drawCard(bot);
   tft.fillRect(bot.x, bot.y, bot.w, 20, COL_HUM);
@@ -1402,7 +1405,7 @@ static void drawAllScreens() {
       };
 
       auto drawStatCard = [&](const char* name, StatData d, const char* unit, bool isInt, uint16_t color, int yTop){
-        Panel p={UI_PAD_X,yTop,SCREEN_WIDTH-2*UI_PAD_X,cardH};
+        Panel p = makePanel(UI_PAD_X, yTop, SCREEN_WIDTH - 2*UI_PAD_X, cardH);
         drawCard(p);
         tft.setTextSize(1);
         tft.setTextColor(color,COL_CARD);
@@ -1606,7 +1609,7 @@ private:
   void (*_onTimeout)() = nullptr;
 
   static NcButton* _instance;
-  static void ICACHE_RAM_ATTR isrThunk(){
+  static void IRAM_ATTR isrThunk(){
     if(_instance) _instance->onIRQ();
   }
 };
@@ -1690,7 +1693,8 @@ static void pruneOldDayFiles() {
     size_t len = strlen(base);
     if (len < 8 || strncmp(base, "day_", 4) != 0 || strcmp(base + len - 4, ".bin") != 0) continue;
     if (count < MAX_FILES) {
-      snprintf(names[count], sizeof(names[count]), "/%s", base);
+      names[count][0] = '/';
+      strncpy(names[count] + 1, base, sizeof(names[count]) - 2);
       names[count][sizeof(names[count]) - 1] = '\0';
       count++;
     }
@@ -1839,7 +1843,9 @@ static void loadDataFromFS() {
     if (len < 8 || strncmp(base, "day_", 4) != 0 || strcmp(base + len - 4, ".bin") != 0) continue;
 
     char cand[24];
-    snprintf(cand, sizeof(cand), "/%s", base);
+    cand[0] = '/';
+    strncpy(cand + 1, base, sizeof(cand) - 2);
+    cand[sizeof(cand) - 1] = '\0';
     if (!found || strcmp(cand, newest) > 0) {
       strncpy(newest, cand, sizeof(newest)-1);
       newest[sizeof(newest)-1] = '\0';
@@ -2123,13 +2129,42 @@ canvas{
   const smoothEl=$("smooth"), modeEl=$("mode"), cOn=$("cOn"), tOn=$("tOn"), hOn=$("hOn");
 
   let dayList=[], data=null, lastStatusT=0;
+  let statusSlot=null;
   let viewMin=0, viewMax=0;
   let DPR=1, cssW=800, cssH=360;
   let hover=null, locked=false, lastPX=0, lastPY=0;
   let brTimer=null;
+  let drawQueued=false;
+  let themeCache=null;
+  let dataVer=0;
+  let smoothCacheKey="";
+  let co2Sm=null, ttSm=null, hhSm=null;
+  let viewCacheKey="";
+  let viewCache=null;
+  let lastTodayFetchT=0;
+  let lastTodaySlot=null;
 
-  function setTheme(th){ document.documentElement.dataset.theme=th; LS.s("theme",th); draw(); }
+  function scheduleDraw(){
+    if(drawQueued) return;
+    drawQueued=true;
+    requestAnimationFrame(()=>{ drawQueued=false; draw(); });
+  }
+
+  function setTheme(th){ document.documentElement.dataset.theme=th; LS.s("theme",th); themeCache=null; scheduleDraw(); }
   $("btnTheme").onclick=()=>setTheme((document.documentElement.dataset.theme==="light")?"dark":"light");
+
+  function getThemeColors(){
+    if(themeCache) return themeCache;
+    const cs=getComputedStyle(document.documentElement);
+    themeCache={
+      panel: cs.getPropertyValue("--panel").trim()||"#10172c",
+      grid:  cs.getPropertyValue("--grid").trim() ||"rgba(255,255,255,.10)",
+      stroke:cs.getPropertyValue("--stroke").trim()||"rgba(255,255,255,.12)",
+      muted: cs.getPropertyValue("--muted").trim()||"rgba(234,240,255,.72)",
+      accent:cs.getPropertyValue("--accent").trim()||"#fad24f",
+    };
+    return themeCache;
+  }
 
   function toRGBA(hex,a){
     const r=parseInt(hex.slice(1,3),16), g=parseInt(hex.slice(3,5),16), b=parseInt(hex.slice(5,7),16);
@@ -2155,6 +2190,7 @@ canvas{
   function fetchStatus(){
     fetchJSON("/status").then(js=>{
       lastStatusT=Date.now();
+      statusSlot=(js && js.slot!=null)?(js.slot|0):null;
       const co2=(js.co2!=null)?Math.round(js.co2):"--";
       const t  =(js.temp!=null)?Number(js.temp).toFixed(1):"--";
       const h  =(js.hum!=null)?Math.round(js.hum):"--";
@@ -2245,7 +2281,13 @@ canvas{
     LS.s("tOn",!!tOn.checked);
     LS.s("hOn",!!hOn.checked);
   }
-  [smoothEl,modeEl,cOn,tOn,hOn].forEach(el=>el.addEventListener("change",()=>{savePrefs(); draw(); renderStats();}));
+  [smoothEl,modeEl,cOn,tOn,hOn].forEach(el=>el.addEventListener("change",()=>{
+    savePrefs();
+    smoothCacheKey="";
+    viewCacheKey="";
+    scheduleDraw();
+    renderStats();
+  }));
   if (br){
     br.addEventListener("input",()=>{
       const v=parseInt(br.value||"0",10);
@@ -2263,8 +2305,13 @@ canvas{
     LS.s("daySel",name);
     const url = (name===TODAY) ? "/api/today" : ("/api/daydata?name="+encodeURIComponent(name));
     fetchJSON(url).then(d=>{
-      if(!d || !Array.isArray(d.co2) || d.co2.length<2){ data=null; draw(); renderStats(); return; }
-      data=d;
+      if(!d || !Array.isArray(d.co2) || d.co2.length<2){ data=null; scheduleDraw(); renderStats(); return; }
+      data=d; dataVer++;
+      smoothCacheKey=""; viewCacheKey="";
+      if(name===TODAY){
+        lastTodayFetchT=Date.now();
+        if(d.slot!=null) lastTodaySlot=d.slot|0;
+      }
       const N=data.co2.length;
       if(resetView){ viewMin=0; viewMax=N-1; }
       else{
@@ -2275,8 +2322,8 @@ canvas{
       hover=null; locked=false;
       $("stTitle").textContent=(name===TODAY)?"Today stats":"Day stats";
       renderStats();
-      draw();
-    }).catch(()=>{ data=null; draw(); renderStats(); });
+      scheduleDraw();
+    }).catch(()=>{ data=null; scheduleDraw(); renderStats(); });
   }
   sel.addEventListener("change",()=>load(sel.value,true));
 
@@ -2286,11 +2333,11 @@ canvas{
       if(!data||!Array.isArray(data.co2))return;
       const N=data.co2.length, step=data.stepMin||5;
       const r=b.dataset.r;
-      if(r==="all"){ viewMin=0; viewMax=N-1; draw(); return; }
+      if(r==="all"){ viewMin=0; viewMax=N-1; scheduleDraw(); return; }
       const mins=(r==="6h")?360:(r==="12h")?720:1440;
       const pts=Math.max(12,Math.round(mins/step));
       viewMax=N-1; viewMin=Math.max(0,viewMax-(pts-1));
-      draw();
+      scheduleDraw();
     });
   });
 
@@ -2303,7 +2350,7 @@ canvas{
     const W=Math.round(cssW*DPR), H=Math.round(cssH*DPR);
     if(cv.width!==W||cv.height!==H){ cv.width=W; cv.height=H; }
     ctx.setTransform(DPR,0,0,DPR,0,0);
-    draw();
+    scheduleDraw();
   }
   let rt=0; window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(resize,120)});
 
@@ -2490,12 +2537,7 @@ canvas{
     const W=cssW,H=cssH;
     ctx.clearRect(0,0,W,H);
 
-    const cs=getComputedStyle(document.documentElement);
-    const panel=cs.getPropertyValue("--panel").trim()||"#10172c";
-    const grid =cs.getPropertyValue("--grid").trim()||"rgba(255,255,255,.10)";
-    const stroke=cs.getPropertyValue("--stroke").trim()||"rgba(255,255,255,.12)";
-    const muted=cs.getPropertyValue("--muted").trim()||"rgba(234,240,255,.72)";
-    const accent=cs.getPropertyValue("--accent").trim()||"#fad24f";
+    const {panel,grid,stroke,muted,accent}=getThemeColors();
 
     ctx.fillStyle=panel; ctx.fillRect(0,0,W,H);
 
@@ -2517,20 +2559,28 @@ canvas{
     const gxW=(gx1-gx0);
     const xOf=(i)=>gx0 + ((i-i0)/Math.max(1,(len-1))) * gxW;
 
-    let cmin=1e9,cmax=-1e9,tmin=1e9,tmax=-1e9,hmin=1e9,hmax=-1e9;
-    for(let i=i0;i<=i1;i++){
-      const c=data.co2[i]||0, t=data.temp[i], h=data.hum[i];
-      if(c>0){ cmin=Math.min(cmin,c); cmax=Math.max(cmax,c); }
-      if(t!=null){ tmin=Math.min(tmin,t); tmax=Math.max(tmax,t); }
-      if(h!=null){ hmin=Math.min(hmin,h); hmax=Math.max(hmax,h); }
-    }
-    if(!(cmax>cmin)){ cmin=300; cmax=2000; }
-    if(!(tmax>tmin)){ tmin=10; tmax=40; }
-    if(!(hmax>hmin)){ hmin=20; hmax=80; }
+    const vcKey=`${dataVer}|${i0}|${i1}`;
+    let cmin,cmax,tmin,tmax,hmin,hmax;
+    if(viewCache && viewCacheKey===vcKey){
+      ({cmin,cmax,tmin,tmax,hmin,hmax}=viewCache);
+    }else{
+      cmin=1e9; cmax=-1e9; tmin=1e9; tmax=-1e9; hmin=1e9; hmax=-1e9;
+      for(let i=i0;i<=i1;i++){
+        const c=data.co2[i]||0, t=data.temp[i], h=data.hum[i];
+        if(c>0){ cmin=Math.min(cmin,c); cmax=Math.max(cmax,c); }
+        if(t!=null){ tmin=Math.min(tmin,t); tmax=Math.max(tmax,t); }
+        if(h!=null){ hmin=Math.min(hmin,h); hmax=Math.max(hmax,h); }
+      }
+      if(!(cmax>cmin)){ cmin=300; cmax=2000; }
+      if(!(tmax>tmin)){ tmin=10; tmax=40; }
+      if(!(hmax>hmin)){ hmin=20; hmax=80; }
 
-    [cmin,cmax]=pad(cmin,cmax,0.08);
-    [tmin,tmax]=pad(tmin,tmax,0.10);
-    [hmin,hmax]=pad(hmin,hmax,0.10);
+      [cmin,cmax]=pad(cmin,cmax,0.08);
+      [tmin,tmax]=pad(tmin,tmax,0.10);
+      [hmin,hmax]=pad(hmin,hmax,0.10);
+      viewCache={cmin,cmax,tmin,tmax,hmin,hmax};
+      viewCacheKey=vcKey;
+    }
 
     const showC=!!cOn.checked, showT=!!tOn.checked, showH=!!hOn.checked;
     const hasC=showC && (cmax>cmin);
@@ -2561,9 +2611,20 @@ canvas{
     const yH=(v)=>yMap(v,hmin,hmax,gy0,gy1);
     const yA=(v)=>yMap(v,aMin,aMax,gy0,gy1);
 
-    const co2=smooth(data.co2, v=>!v);
-    const tt =smooth(data.temp, v=>v==null);
-    const hh =smooth(data.hum,  v=>v==null);
+    const smKey=`${dataVer}|${smoothEl.checked?1:0}`;
+    if(smKey!==smoothCacheKey){
+      smoothCacheKey=smKey;
+      if(smoothEl.checked){
+        co2Sm=smooth(data.co2, v=>!v);
+        ttSm =smooth(data.temp, v=>v==null);
+        hhSm =smooth(data.hum,  v=>v==null);
+      }else{
+        co2Sm=null; ttSm=null; hhSm=null;
+      }
+    }
+    const co2=co2Sm||data.co2;
+    const tt =ttSm ||data.temp;
+    const hh =hhSm ||data.hum;
 
     // captions
     ctx.fillStyle=muted; ctx.font="11px ui-monospace,Menlo,Consolas,monospace";
@@ -2688,7 +2749,7 @@ canvas{
     const padL=62,padR=24;
     const gx0=padL,gx1=cssW-padR;
 
-    if(x<gx0||x>gx1){ hover=null; hideTip(); draw(); return; }
+    if(x<gx0||x>gx1){ hover=null; hideTip(); scheduleDraw(); return; }
 
     const N=data.co2.length;
     const i0=Math.max(0,Math.min(viewMin,viewMax));
@@ -2701,10 +2762,10 @@ canvas{
     hover=idx;
 
     updateTip();
-    draw();
+    scheduleDraw();
   });
 
-  cv.addEventListener("pointerleave",()=>{ if(!locked){ hover=null; hideTip(); draw(); }});
+  cv.addEventListener("pointerleave",()=>{ if(!locked){ hover=null; hideTip(); scheduleDraw(); }});
   cv.addEventListener("click",()=>{ locked=!locked; if(!locked&&hover==null) hideTip(); else updateTip(); });
 
   // wheel zoom (desktop)
@@ -2736,7 +2797,7 @@ canvas{
     if(nx>N-1){ nx=N-1; nm=N-newLen; }
 
     viewMin=nm; viewMax=nx;
-    draw();
+    scheduleDraw();
   },{passive:false});
 
   // ----- touch gestures (phones): drag=pan, pinch=zoom, double-tap=reset -----
@@ -2771,7 +2832,7 @@ canvas{
     if(nm<0){ nm=0; nx=newLen-1; }
     if(nx>g.N-1){ nx=g.N-1; nm=g.N-newLen; }
     viewMin=nm; viewMax=nx;
-    draw();
+    scheduleDraw();
   }
   function setMobileHint(){
     const h=$("hint"); if(!h) return;
@@ -2797,7 +2858,7 @@ canvas{
       const g=geom();
       viewMin=0; viewMax=g.N-1;
       locked=false; hover=null; hideTip();
-      draw();
+      scheduleDraw();
       return;
     }
 
@@ -2852,7 +2913,7 @@ canvas{
     viewMax=clamp(nx,0,g.N-1);
 
     locked=false; hover=null; hideTip();
-    draw();
+    scheduleDraw();
   });
 
   cv.addEventListener("pointerup",(ev)=>{
@@ -2868,7 +2929,7 @@ canvas{
         locked=true;
         lastPX=ev.clientX; lastPY=ev.clientY;
         updateTip();
-        draw();
+        scheduleDraw();
       }
     }
 
@@ -2893,14 +2954,20 @@ canvas{
   };
 
   // today auto refresh
-  function todayTick(){ if(sel.value===TODAY) load(TODAY,false); }
+  function todayTick(){
+    if(sel.value!==TODAY) return;
+    const now=Date.now();
+    const slotChanged=(statusSlot!=null && lastTodaySlot!=null && statusSlot!==lastTodaySlot);
+    const stale=(now-lastTodayFetchT)>60000;
+    if(slotChanged || stale) load(TODAY,false);
+  }
 
   // init
   restorePrefs();
   fetchStatus(); setInterval(fetchStatus,30000);
   fetchBrightness(); setInterval(fetchBrightness,60000);
   setInterval(tickLiveChip,1500);
-  setInterval(todayTick,12000);
+  setInterval(todayTick,15000);
 
   requestAnimationFrame(()=>{ resize(); fetchDayList(); });
 
@@ -2929,6 +2996,10 @@ static void handleStatus() {
   out += (offlineMode ? "true" : "false");
   out += ",\"deviceEpoch\":";
   out += String((unsigned long)approxNow());
+  out += ",\"slot\":";
+  out += String((int)currentSlot);
+  out += ",\"stepMin\":";
+  out += String((int)SLOT_MINUTES);
 
   out += ",\"co2\":";
   out += (isnan(currentCO2)  ? "null" : String(currentCO2, 1));
